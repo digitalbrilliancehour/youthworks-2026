@@ -90,7 +90,7 @@ BasicGame.Boot.prototype = {
 
   },
 
-  function resizeGame(scaleManager, parentBounds) {
+  resizeGame: function (scaleManager, parentBounds) {
     var scaleAmount = parentBounds.height / game.height;
 
     scaleManager.setUserScale(
