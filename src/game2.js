@@ -549,12 +549,12 @@ BasicGame.Game2.prototype = {
     this.playerControl = false;
     this.bossMusic.stop();
 
-    // Back down slowly
+    // Back down slightly then take off
     this.player.body.velocity.x = 0;
-    this.player.body.velocity.y = 100;
+    this.player.body.velocity.y = 50;
 
-    // After 1 second, accelerate upward off screen
-    this.time.events.add(Phaser.Timer.SECOND, function () {
+    // After a brief drawback, accelerate upward off screen
+    this.time.events.add(Phaser.Timer.SECOND * 0.3, function () {
       this.player.body.collideWorldBounds = false;
       this.add.tween(this.player.body.velocity).to(
         { y: -800 }, 1500, Phaser.Easing.Quadratic.In, true
@@ -562,14 +562,16 @@ BasicGame.Game2.prototype = {
     }, this);
 
     // After takeoff, fade to black
-    this.time.events.add(Phaser.Timer.SECOND * 2.5, function () {
-      this.camera.fade(0x000000, 1000);
-    }, this);
-
-    // After fade completes, show win screen
-    this.camera.onFadeComplete.addOnce(function () {
-      this.camera.flash(0x000000, 1);
-      this.displayEnd(true);
+    this.time.events.add(Phaser.Timer.SECOND * 1.8, function () {
+      var fade = this.add.graphics(0, 0);
+      fade.beginFill(0x000000);
+      fade.drawRect(0, 0, this.game.width, this.game.height);
+      fade.endFill();
+      fade.alpha = 0;
+      var fadeTween = this.add.tween(fade).to({ alpha: 1 }, 1000, Phaser.Easing.Linear.None, true);
+      fadeTween.onComplete.addOnce(function () {
+        this.displayEnd(true);
+      }, this);
     }, this);
   },
   
