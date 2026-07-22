@@ -201,12 +201,25 @@ BasicGame.Game2.prototype = {
   },
 
   update: function () { 
+	this.scrollBackground();
 	this.checkCollisions(); 
 	this.spawnEnemies(); 
   this.enemyFire(); 
 	this.processPlayerInput(); 
 	this.processDelayedEffects(); 
 	},
+
+  scrollBackground: function () {
+    if (this.bgType !== 'image') { return; }
+    this.bg.y += this.bgScrollSpeed * this.time.physicsElapsed;
+    if (this.bg.y >= 0) {
+      if (this.bgLoop) {
+        this.bg.y = -(this.bgScaledHeight - this.game.height);
+      } else {
+        this.bg.y = 0;
+      }
+    }
+  },
   
   enemyFire: function() { 
 	this.shooterPool.forEachAlive(function (enemy) { 
@@ -395,8 +408,22 @@ BasicGame.Game2.prototype = {
   // create()- related functions  
   //  
   setupBackground: function () {  
-    this.sea = this.add.tileSprite(0, 0, this.game.width, this.game.height, this.config.backgroundKey);  
-    this.sea.autoScroll(0, BasicGame.SEA_SCROLL_SPEED);  
+    var cfg = this.config.background;
+    var speed = cfg.scrollSpeed || BasicGame.SEA_SCROLL_SPEED;
+
+    if (cfg.type === 'tile') {
+      this.bg = this.add.tileSprite(0, 0, this.game.width, this.game.height, cfg.key);
+      this.bg.autoScroll(0, speed);
+    } else if (cfg.type === 'image') {
+      this.bg = this.add.image(0, 0, cfg.key);
+      var scaleFactor = this.game.width / this.bg.texture.width;
+      this.bg.scale.setTo(scaleFactor, scaleFactor);
+      this.bgScaledHeight = this.bg.texture.height * scaleFactor;
+      this.bg.y = -(this.bgScaledHeight - this.game.height);
+      this.bgScrollSpeed = speed;
+      this.bgLoop = cfg.loop || false;
+    }
+    this.bgType = cfg.type;
   },  
 
   setupPlayer: function () {  
@@ -620,7 +647,7 @@ BasicGame.Game2.prototype = {
 
     //  Here you should destroy anything you no longer need.
     //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
-		this.sea.destroy();     
+		this.bg.destroy();     
     this.player.destroy();     
     this.enemyPool.destroy();     
     this.bulletPool.destroy();     

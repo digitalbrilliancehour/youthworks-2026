@@ -1,6 +1,9 @@
 BasicGame.STAGE1_CONFIG = {
   // Background
-  backgroundKey: 'sea',
+  background: {
+    key: 'sea',
+    type: 'tile'
+  },
 
   // Player
   player: {
@@ -69,7 +72,10 @@ BasicGame.STAGE1_CONFIG = {
 
 BasicGame.STAGE2_CONFIG = {
   // Background
-  backgroundKey: 'sand',
+  background: {
+    key: 'sand',
+    type: 'tile'
+  },
 
   // Player
   player: {
