@@ -65,10 +65,11 @@ BasicGame.Game.prototype = {
 }, 
   
   setupPlayerIcons: function () { 
+  var puCfg = this.config.powerUp;
   this.powerUpPool = this.add.group();     
   	this.powerUpPool.enableBody = true;     
   	this.powerUpPool.physicsBodyType = Phaser.Physics.ARCADE;     
-  	this.powerUpPool.createMultiple(5, this.config.powerUpKey);     
+  	this.powerUpPool.createMultiple(5, puCfg.key);     
   	this.powerUpPool.setAll('anchor.x', 0.5);     
   	this.powerUpPool.setAll('anchor.y', 0.5);     
   	this.powerUpPool.setAll('outOfBoundsKill', true);     
@@ -76,6 +77,14 @@ BasicGame.Game.prototype = {
   	this.powerUpPool.setAll(       
   		'reward', BasicGame.POWERUP_REWARD, false, false, 0, true     
   	);
+    if (puCfg.animated) {
+      this.powerUpPool.forEach(function (p) {
+        for (var i = 0; i < puCfg.animations.length; i++) {
+          var anim = puCfg.animations[i];
+          p.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+        }
+      });
+    }
 	this.lives = this.add.group(); 
 	// calculate location of first life icon 
 	var livesCount = (this.game.lives !== undefined) ? this.game.lives : BasicGame.PLAYER_EXTRA_LIVES;
@@ -257,6 +266,7 @@ BasicGame.Game.prototype = {
   },
   
   enemyFire: function() { 
+    var ebCfg = this.config.enemyBullet;
 	this.shooterPool.forEachAlive(function (enemy) { 
 	  	if (this.time.now > enemy.nextShotAt && this.enemyBulletPool.countDead() > 0) { 
 		  	var bullet = this.enemyBulletPool.getFirstExists(false); 
@@ -264,6 +274,7 @@ BasicGame.Game.prototype = {
 		  	this.physics.arcade.moveToObject( 
 		  	bullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY 
 		  	); 
+		  	if (ebCfg.animated) { bullet.play(ebCfg.defaultAnimation); }
 		  	enemy.nextShotAt = this.time.now + BasicGame.SHOOTER_SHOT_DELAY;
         this.enemyFireSFX.play();
 		} 
@@ -300,6 +311,8 @@ BasicGame.Game.prototype = {
 				BasicGame.ENEMY_BULLET_VELOCITY           
 			);         
 		}  
+    if (ebCfg.animated) { leftBullet.play(ebCfg.defaultAnimation); }
+    if (ebCfg.animated) { rightBullet.play(ebCfg.defaultAnimation); }
     this.enemyFireSFX.play();
 
 		}     
@@ -314,10 +327,14 @@ BasicGame.Game.prototype = {
   playerHit: function (player, enemy) {     
     // crashing into an enemy only deals 5 damage     
 	this.damageEnemy(enemy, BasicGame.CRASH_DAMAGE);     
-    var explosion = this.add.sprite(player.x, player.y, this.config.explosionKey);     
+    var exCfg = this.config.explosion;
+    var explosion = this.add.sprite(player.x, player.y, exCfg.key);     
     explosion.anchor.setTo(0.5, 0.5);     
-    explosion.animations.add('boom');     
-    explosion.play('boom', 15, false, true);     
+    if (exCfg.animated) {
+      var anim = exCfg.animations[0];
+      explosion.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+      explosion.play(anim.name, anim.fps, anim.loop, exCfg.destroyOnComplete || false);
+    }     
     var life = this.lives.getFirstAlive();     
     if (life !== null) {       
       life.kill(); 
@@ -364,7 +381,9 @@ BasicGame.Game.prototype = {
     if (this.rnd.frac() < enemy.dropRate) { 
 	    var powerUp = this.powerUpPool.getFirstExists(false); 
 	    powerUp.reset(enemy.x, enemy.y); 
-	    powerUp.body.velocity.y = BasicGame.POWERUP_VELOCITY; 
+	    powerUp.body.velocity.y = BasicGame.POWERUP_VELOCITY;
+	    var puCfg = this.config.powerUp;
+	    if (puCfg.animated) { powerUp.play(puCfg.defaultAnimation); }
 	} 
 },
   
@@ -391,9 +410,13 @@ BasicGame.Game.prototype = {
 	if (this.explosionPool.countDead() === 0) { 
 		return; 
 	} 
+	var exCfg = this.config.explosion;
 	var explosion = this.explosionPool.getFirstExists(false); 
 	explosion.reset(sprite.x, sprite.y); 
-	explosion.play('boom', 15, false, true); 
+	if (exCfg.animated) {
+	  var anim = exCfg.animations[0];
+	  explosion.play(anim.name, anim.fps, anim.loop, exCfg.destroyOnComplete || false);
+	}
 	// add the original sprite's velocity to the explosion 
 	explosion.body.velocity.x = sprite.body.velocity.x; 
 	explosion.body.velocity.y = sprite.body.velocity.y; 
@@ -406,6 +429,7 @@ BasicGame.Game.prototype = {
     
   	this.nextShotAt = this.time.now + this.shotDelay;
     this.playerFireSFX.play();
+    var bCfg = this.config.bullet;
   	
   	var bullet;     
     if (this.weaponLevel === 0) {       
@@ -414,7 +438,8 @@ BasicGame.Game.prototype = {
 		}       
 		bullet = this.bulletPool.getFirstExists(false);       
 		bullet.reset(this.player.x, this.player.y - 20);       
-		bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;     
+		bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
+		if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
 	} else {       
 		if (this.bulletPool.countDead() < this.weaponLevel * 2) {         
 			return;       
@@ -426,14 +451,16 @@ BasicGame.Game.prototype = {
 			// the left bullets spread from -95 degrees to -135 degrees         
 			this.physics.arcade.velocityFromAngle(           
 				-95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity         
-			);          
+			);
+			if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
 			bullet = this.bulletPool.getFirstExists(false);         
 			// spawn right bullet slightly right off center         
 			bullet.reset(this.player.x + (10 + i * 6), this.player.y - 20);         
 			// the right bullets spread from -85 degrees to -45         
 			this.physics.arcade.velocityFromAngle(           
 				-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity         
-			);       
+			);
+			if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
 		}     
 	} 
 	},
@@ -571,15 +598,26 @@ BasicGame.Game.prototype = {
   }, 
 
   setupBullets: function () { 
+    var ebCfg = this.config.enemyBullet;
   	this.enemyBulletPool = this.add.group();     
   	this.enemyBulletPool.enableBody = true;     
   	this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;     
-  	this.enemyBulletPool.createMultiple(100, this.config.enemyBulletKey);     
+  	this.enemyBulletPool.createMultiple(100, ebCfg.key);     
   	this.enemyBulletPool.setAll('anchor.x', 0.5);     
   	this.enemyBulletPool.setAll('anchor.y', 0.5);     
   	this.enemyBulletPool.setAll('outOfBoundsKill', true);     
   	this.enemyBulletPool.setAll('checkWorldBounds', true);     
   	this.enemyBulletPool.setAll('reward', 0, false, false, 0, true);
+    if (ebCfg.animated) {
+      this.enemyBulletPool.forEach(function (b) {
+        for (var i = 0; i < ebCfg.animations.length; i++) {
+          var anim = ebCfg.animations[i];
+          b.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+        }
+      });
+    }
+
+    var bCfg = this.config.bullet;
     // Add an empty sprite group into our game 
     this.bulletPool = this.add.group(); 
 
@@ -587,10 +625,7 @@ BasicGame.Game.prototype = {
     this.bulletPool.enableBody = true; 
     this.bulletPool.physicsBodyType = Phaser.Physics.ARCADE; 
 
-    // Add 100 'bullet' sprites in the group. 
-    // By default this uses the first frame of the sprite sheet and 
-    //   sets the initial state as non-existing (i.e. killed/dead) 
-    this.bulletPool.createMultiple(100, this.config.bulletKey); 
+    this.bulletPool.createMultiple(100, bCfg.key); 
 
     // Sets anchors of all sprites 
     this.bulletPool.setAll('anchor.x', 0.5); 
@@ -600,20 +635,35 @@ BasicGame.Game.prototype = {
     this.bulletPool.setAll('outOfBoundsKill', true); 
     this.bulletPool.setAll('checkWorldBounds', true); 
 
+    if (bCfg.animated) {
+      this.bulletPool.forEach(function (b) {
+        for (var i = 0; i < bCfg.animations.length; i++) {
+          var anim = bCfg.animations[i];
+          b.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+        }
+      });
+    }
+
     this.nextShotAt = 0; 
     this.shotDelay = BasicGame.SHOT_DELAY; 
   }, 
 
   setupExplosions: function () { 
+    var exCfg = this.config.explosion;
     this.explosionPool = this.add.group(); 
     this.explosionPool.enableBody = true; 
     this.explosionPool.physicsBodyType = Phaser.Physics.ARCADE; 
-    this.explosionPool.createMultiple(100, this.config.explosionKey); 
+    this.explosionPool.createMultiple(100, exCfg.key); 
     this.explosionPool.setAll('anchor.x', 0.5); 
     this.explosionPool.setAll('anchor.y', 0.5); 
-    this.explosionPool.forEach(function (explosion) { 
-      explosion.animations.add('boom'); 
-    });
+    if (exCfg.animated) {
+      this.explosionPool.forEach(function (explosion) {
+        for (var i = 0; i < exCfg.animations.length; i++) {
+          var anim = exCfg.animations[i];
+          explosion.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+        }
+      });
+    }
   }, 
 
   setupText: function () { 
