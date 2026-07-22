@@ -50,11 +50,34 @@ BasicGame.STAGE1_CONFIG = {
     defaultAnimation: 'fly'
   },
 
-  // Simple assets (no animation config needed)
-  bulletKey: 'bullet',
-  enemyBulletKey: 'enemyBullet',
-  explosionKey: 'explosion',
-  powerUpKey: 'powerup1',
+  // Bullet
+  bullet: {
+    key: 'bullet',
+    animated: false
+  },
+
+  // Enemy bullet
+  enemyBullet: {
+    key: 'enemyBullet',
+    animated: false
+  },
+
+  // Explosion
+  explosion: {
+    key: 'explosion',
+    animated: true,
+    animations: [
+      { name: 'boom', frames: null, fps: 15, loop: false }
+    ],
+    defaultAnimation: 'boom',
+    destroyOnComplete: true
+  },
+
+  // Power-up
+  powerUp: {
+    key: 'powerup1',
+    animated: false
+  },
 
   // Audio
   explosionSFX: 'explosion',
@@ -122,11 +145,34 @@ BasicGame.STAGE2_CONFIG = {
     defaultAnimation: 'fly'
   },
 
-  // Simple assets (no animation config needed)
-  bulletKey: 'bullet',
-  enemyBulletKey: 'enemyBullet',
-  explosionKey: 'explosion',
-  powerUpKey: 'powerup1',
+  // Bullet
+  bullet: {
+    key: 'bullet',
+    animated: false
+  },
+
+  // Enemy bullet
+  enemyBullet: {
+    key: 'enemyBullet',
+    animated: false
+  },
+
+  // Explosion
+  explosion: {
+    key: 'explosion',
+    animated: true,
+    animations: [
+      { name: 'boom', frames: null, fps: 15, loop: false }
+    ],
+    defaultAnimation: 'boom',
+    destroyOnComplete: true
+  },
+
+  // Power-up
+  powerUp: {
+    key: 'powerup1',
+    animated: false
+  },
 
   // Audio
   explosionSFX: 'explosion',
