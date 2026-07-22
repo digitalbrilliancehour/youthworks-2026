@@ -35,13 +35,8 @@ BasicGame.STAGE1_CONFIG = {
 
   // Boss
   boss: {
-    key: 'boss',
-    animated: true,
-    animations: [
-      { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
-      { name: 'hit', frames: [3, 1, 3, 2], fps: 20, loop: false }
-    ],
-    defaultAnimation: 'fly'
+    key: 'boss1',
+    animated: false,
   },
 
   // Bullet
