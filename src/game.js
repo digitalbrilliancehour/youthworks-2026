@@ -234,12 +234,16 @@ BasicGame.Game.prototype = {
     // Boss lean animation based on horizontal movement
     var bCfg = this.config.boss;
     if (this.boss.alive && !this.bossApproaching && bCfg.animated) {
-      if (this.boss.body.velocity.x < 0 && bCfg.leanLeft) {
-        this.boss.play(bCfg.leanLeft);
-      } else if (this.boss.body.velocity.x > 0 && bCfg.leanRight) {
-        this.boss.play(bCfg.leanRight);
-      } else {
-        this.boss.play(bCfg.defaultAnimation);
+      var currentAnim = this.boss.animations.currentAnim;
+      // Only apply lean logic if no animation is playing or current one loops
+      if (!currentAnim || currentAnim.loop) {
+        if (this.boss.body.velocity.x < 0 && bCfg.leanLeft) {
+          this.boss.play(bCfg.leanLeft);
+        } else if (this.boss.body.velocity.x > 0 && bCfg.leanRight) {
+          this.boss.play(bCfg.leanRight);
+        } else {
+          this.boss.play(bCfg.defaultAnimation);
+        }
       }
     }
   },
