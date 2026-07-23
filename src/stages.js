@@ -29,8 +29,8 @@ BasicGame.STAGE1_CONFIG = {
   enemy: {
     key: 'enemy2',
     animated: true,
-      scale: 1.5,
-      crisp: true,
+    scale: 1.5,
+    crisp: true,
     animations: [
       { name: 'fly', frames: [0, 1], fps: 20, loop: true },
     ],
@@ -41,8 +41,8 @@ BasicGame.STAGE1_CONFIG = {
   shooter: {
     key: 'enemy1',
     animated: false,
-      scale: 1,
-      crisp: true,
+    scale: 1,
+    crisp: true,
   },
 
   // Boss
@@ -56,31 +56,31 @@ BasicGame.STAGE1_CONFIG = {
   // Bullet
   bullet: {
     key: 'playerBullet',
-    animated: false, 
+    animated: false,
     scale: 0.2,
     crisp: true
   },
 
-   playerBullet: {
+  playerBullet: {
     key: 'player1Bullet',
     animated: false
   },
 
- 
-  
- boss1Bullet: {
+
+
+  boss1Bullet: {
     key: 'boss1Bullet',
     animated: false
   },
   // Enemy bullet
- enemyBullet: {
-  key: 'enemy1Bullet',
-  animated: true,
-  animations: [
-    { name: 'fire', frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 10, loop: true }
-  ],
-  defaultAnimation: 'fire'
-},
+  enemyBullet: {
+    key: 'enemy1Bullet',
+    animated: true,
+    animations: [
+      { name: 'fire', frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 10, loop: true }
+    ],
+    defaultAnimation: 'fire'
+  },
   // Explosion
   explosion: {
     key: 'shipexplosion',
@@ -91,36 +91,36 @@ BasicGame.STAGE1_CONFIG = {
     defaultAnimation: 'boom',
     destroyOnComplete: true
   },
-    
 
-    enemy1Explosion: {
-      key: 'explosion3',
-      animated: true,
-      animations: [
-        { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6, 7, 8], fps: 15, loop: false }
-      ],
-      defaultAnimation: 'boom',
-    destroyOnComplete: true
-    },
-    enemy2Explosion: {
-      key: 'explosion2',
-      animated: true,
-      animations: [
-        { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6], fps: 15, loop: false }
-      ],
-      defaultAnimation: 'boom',
-    destroyOnComplete: true
-    },
 
-    bossExplosion: {
-      key: 'explosion1',
-      animated: true,
-      animations: [
-        { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 15, loop: false }
-      ],
-      defaultAnimation: 'boom',
+  enemy1Explosion: {
+    key: 'explosion3',
+    animated: true,
+    animations: [
+      { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6, 7, 8], fps: 15, loop: false }
+    ],
+    defaultAnimation: 'boom',
     destroyOnComplete: true
-    },
+  },
+  enemy2Explosion: {
+    key: 'explosion2',
+    animated: true,
+    animations: [
+      { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6], fps: 15, loop: false }
+    ],
+    defaultAnimation: 'boom',
+    destroyOnComplete: true
+  },
+
+  bossExplosion: {
+    key: 'explosion1',
+    animated: true,
+    animations: [
+      { name: 'boom', frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 15, loop: false }
+    ],
+    defaultAnimation: 'boom',
+    destroyOnComplete: true
+  },
 
 
   // Power-up
@@ -140,7 +140,7 @@ BasicGame.STAGE1_CONFIG = {
   gameOverMusic: 'gameOverMusic',
 
   // Next stage
-  nextState: 'Game2'
+  nextState: null
 };
 
 BasicGame.STAGE2_CONFIG = {
@@ -171,8 +171,8 @@ BasicGame.STAGE2_CONFIG = {
   enemy: {
     key: 'enemy2',
     animated: true,
-      scale: 1,
-      crisp: true,
+    scale: 1,
+    crisp: true,
     animations: [
       { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
     ],
@@ -183,8 +183,8 @@ BasicGame.STAGE2_CONFIG = {
   shooter: {
     key: 'enemy1',
     animated: false,
-      scale: 1,
-      crisp: true,
+    scale: 1,
+    crisp: true,
   },
 
   // Boss

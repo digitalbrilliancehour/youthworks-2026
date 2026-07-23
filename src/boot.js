@@ -38,7 +38,11 @@ var BasicGame = {
   PLAYER_GHOST_TIME: Phaser.Timer.SECOND * 3,
 
   INSTRUCTION_EXPIRE: Phaser.Timer.SECOND * 10,
-  RETURN_MESSAGE_DELAY: Phaser.Timer.SECOND * 2
+  RETURN_MESSAGE_DELAY: Phaser.Timer.SECOND * 2,
+
+  BOSS_RING_SHOT_DELAY: Phaser.Timer.SECOND * 2.5,
+  BOSS_RING_SHOT_BULLETS: 14,
+  BOSS_RING_SHOT_SPEED: 150
 };
 
 BasicGame.Boot = function (game) {
@@ -59,11 +63,11 @@ BasicGame.Boot.prototype = {
       //  If you have any desktop specific settings, they can go in here
       //this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
       //this.scale.setMinMax(480, 260, 1024, 768);
-		this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-        this.scale.compatibility.canExpandParent = false;
-		this.scale.setResizeCallback(this.resizeGame, this);
-    	//this.scale.pageAlignHorizontally = true;
-    	//this.scale.pageAlignVertically = true;
+      this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+      this.scale.compatibility.canExpandParent = false;
+      this.scale.setResizeCallback(this.resizeGame, this);
+      //this.scale.pageAlignHorizontally = true;
+      //this.scale.pageAlignVertically = true;
     } else {
       //  Same goes for mobile settings.
       //  In this case we're saying "scale the game, no lower than 480x260 and no higher than 1024x768"
@@ -73,7 +77,7 @@ BasicGame.Boot.prototype = {
     }
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
-	this.scale.refresh();
+    this.scale.refresh();
   },
 
   preload: function () {
