@@ -56,7 +56,7 @@ BasicGame.Preloader.prototype = {
     //  + lots of other required assets here
  this.load.image('playerBullet', 'assets/playerBullet.png');
   
-    this.load.spritesheet('Boss1Bullet','assets/Boss1Bullet.png', 13,13);
+    this.load.spritesheet('boss1Bullet','assets/boss1Bullet.png', 13,13);
     this.load.image('bg1','assets/stage1-back.png');
     this.load.image('bg2','assets/stage2-back.png');
     this.load.image('menuBack', 'assets/menuBack.png');

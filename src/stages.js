@@ -29,10 +29,10 @@ BasicGame.STAGE1_CONFIG = {
   enemy: {
     key: 'enemy2',
     animated: true,
-      scale: 1,
+      scale: 1.5,
       crisp: true,
     animations: [
-      { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
+      { name: 'fly', frames: [0, 1], fps: 20, loop: true },
     ],
     defaultAnimation: 'fly'
   },
