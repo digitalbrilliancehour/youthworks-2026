@@ -505,6 +505,7 @@ BasicGame.Game.prototype = {
     this.nextShotAt = this.time.now + this.shotDelay;
     this.playerFireSFX.play();
     var bCfg = this.config.playerBullet || this.config.bullet;
+    var bulletAngle = (bCfg.angle !== undefined) ? bCfg.angle : -90;
 
     var bullet;
     if (this.weaponLevel === 0) {
@@ -514,6 +515,12 @@ BasicGame.Game.prototype = {
       bullet = this.bulletPool.getFirstExists(false);
       bullet.reset(this.player.x, this.player.y - 20);
       bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
+      bullet.angle = bulletAngle;
+      if (bCfg.hitbox) {
+        bullet.body.setSize(bCfg.hitbox.width, bCfg.hitbox.height, bCfg.hitbox.offsetX || 0, bCfg.hitbox.offsetY || 0);
+      } else {
+        bullet.body.setSize(8, 32, 12, -12);
+      }
       if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
     } else {
       if (this.bulletPool.countDead() < this.weaponLevel * 2) {
@@ -527,7 +534,14 @@ BasicGame.Game.prototype = {
         this.physics.arcade.velocityFromAngle(
           -95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity
         );
+        bullet.angle = bulletAngle;
+        if (bCfg.hitbox) {
+          bullet.body.setSize(bCfg.hitbox.width, bCfg.hitbox.height, bCfg.hitbox.offsetX || 0, bCfg.hitbox.offsetY || 0);
+        } else {
+          bullet.body.setSize(8, 32, 12, -12);
+        }
         if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
+
         bullet = this.bulletPool.getFirstExists(false);
         // spawn right bullet slightly right off center         
         bullet.reset(this.player.x + (10 + i * 6), this.player.y - 20);
@@ -535,6 +549,12 @@ BasicGame.Game.prototype = {
         this.physics.arcade.velocityFromAngle(
           -85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity
         );
+        bullet.angle = bulletAngle;
+        if (bCfg.hitbox) {
+          bullet.body.setSize(bCfg.hitbox.width, bCfg.hitbox.height, bCfg.hitbox.offsetX || 0, bCfg.hitbox.offsetY || 0);
+        } else {
+          bullet.body.setSize(8, 32, 12, -12);
+        }
         if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
       }
     }
@@ -569,6 +589,9 @@ BasicGame.Game.prototype = {
   },
 
   applyScaleAndHitbox: function (sprite, cfg) {
+    if (cfg.angle !== undefined) {
+      sprite.angle = cfg.angle;
+    }
     if (cfg.scale) {
       var sx = (typeof cfg.scale === 'object') ? cfg.scale.x : cfg.scale;
       var sy = (typeof cfg.scale === 'object') ? cfg.scale.y : cfg.scale;
