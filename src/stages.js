@@ -3,7 +3,7 @@ BasicGame.STAGE1_CONFIG = {
   background: {
     key: 'bg1',
     type: 'image',
-    scrollSpeed: 12,
+    scrollSpeed: 300,
     loop: false
   },
 
@@ -62,7 +62,9 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 0.2,
     crisp: true,
-    damage: 1
+    damage: 1,
+    angle: -90,
+    hitbox: { width: 8, height: 32, offsetX: 0, offsetY: -12 }
   },
 
   playerBullet: {
@@ -70,7 +72,9 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 0.2,
     crisp: true,
-    damage: 1
+    damage: 1,
+    angle: -90,
+    hitbox: { width: 8, height: 32, offsetX: 0, offsetY: -12 }
   },
 
   // Shooter Enemy Bullet Config
@@ -156,7 +160,13 @@ BasicGame.STAGE1_CONFIG = {
   gameOverMusic: 'gameOverMusic',
 
   // Next stage
-  nextState: null
+  nextState: null,
+
+  // Boss spawn trigger: 'scrollEnd' or 'score'
+  bossSpawnTrigger: 'scrollEnd',
+
+  // Debug
+  debug: false
 };
 
 BasicGame.STAGE2_CONFIG = {
@@ -278,5 +288,8 @@ BasicGame.STAGE2_CONFIG = {
   gameOverMusic: 'gameOverMusic',
 
   // Next stage
-  nextState: null  // final stage — win screen on boss defeat
+  nextState: null,  // final stage — win screen on boss defeat
+
+  // Boss spawn trigger: 'scrollEnd' or 'score'
+  bossSpawnTrigger: 'score'
 };
