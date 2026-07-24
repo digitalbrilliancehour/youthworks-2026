@@ -357,6 +357,7 @@ BasicGame.Game.prototype = {
       life.kill();
       this.weaponLevel = 0;
       this.ghostUntil = this.time.now + BasicGame.PLAYER_GHOST_TIME;
+      this.damageFlash(player);
       if (this.player.animations.getAnimation('ghost')) {
         this.player.play('ghost');
       }
@@ -373,6 +374,7 @@ BasicGame.Game.prototype = {
       if (enemy.animations.getAnimation('hit')) {
         enemy.play('hit');
       }
+      this.damageFlash(enemy);
     } else {
       this.explosionSFX.play();
       this.explode(enemy);
@@ -416,7 +418,7 @@ BasicGame.Game.prototype = {
     this.score += score;
     this.scoreText.text = this.score;
     // this approach prevents the boss from spawning again upon winning     
-    if (this.score >= 20000 && this.bossPool.countDead() == 1) {
+    if (this.score >= 20 && this.bossPool.countDead() == 1) {
       this.spawnBoss();
     }
   },
@@ -474,10 +476,6 @@ BasicGame.Game.prototype = {
       bullet = this.bulletPool.getFirstExists(false);
       bullet.reset(this.player.x, this.player.y - 20);
       bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
-      this.bulletPool.forEach(function (bullet) {
-        bullet.angle = -90;
-        bullet.body.setSize(8, 32, 12, -12); // adjust to your image
-      }, this);
       if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
     } else {
       if (this.bulletPool.countDead() < this.weaponLevel * 2) {
@@ -506,8 +504,14 @@ BasicGame.Game.prototype = {
   },
 
   render: function () {
-    //this.game.debug.body(this.bullet);
-    //this.game.debug.body(this.enemy);
+    if (!this.config.debug) { return; }
+    this.game.debug.body(this.player);
+    this.game.debug.body(this.boss);
+    this.enemyPool.forEachAlive(function (e) { this.game.debug.body(e); }, this);
+    this.shooterPool.forEachAlive(function (e) { this.game.debug.body(e); }, this);
+    this.bulletPool.forEachAlive(function (b) { this.game.debug.body(b); }, this);
+    this.enemyBulletPool.forEachAlive(function (b) { this.game.debug.body(b); }, this);
+    this.powerUpPool.forEachAlive(function (p) { this.game.debug.body(p); }, this);
   },
 
   //  
@@ -540,6 +544,9 @@ BasicGame.Game.prototype = {
     }
     if (cfg.crisp) {
       sprite.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    }
+    if (cfg.angle !== undefined) {
+      sprite.angle = cfg.angle;
     }
     if (cfg.hitbox) {
       sprite.body.setSize(cfg.hitbox.width, cfg.hitbox.height, cfg.hitbox.offsetX || 0, cfg.hitbox.offsetY || 0);
@@ -836,6 +843,22 @@ BasicGame.Game.prototype = {
         this.state.start(this.config.nextState, true, false, BasicGame.STAGE2_CONFIG);
       }, this);
     }, this);
+  },
+
+  damageFlash: function (sprite, duration, color) {
+	// Default to 100ms duration and white (ADD blend) if no color specified
+	duration = duration || 100;
+	if (color) {
+		sprite.tint = color;
+		this.time.events.add(duration, function () {
+		sprite.tint = 0xffffff;
+		}, this);
+	} else {
+		sprite.blendMode = PIXI.blendModes.ADD;
+		this.time.events.add(duration, function () {
+		sprite.blendMode = PIXI.blendModes.NORMAL;
+		}, this);
+	}
   },
 
   displayEnd: function (win) {

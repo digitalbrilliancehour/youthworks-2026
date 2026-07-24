@@ -353,6 +353,7 @@ BasicGame.Game2.prototype = {
       life.kill(); 
       this.weaponLevel = 0;
       this.ghostUntil = this.time.now + BasicGame.PLAYER_GHOST_TIME;
+      this.damageFlash(player);
       if (this.player.animations.getAnimation('ghost')) {
         this.player.play('ghost');
       }     
@@ -369,6 +370,7 @@ BasicGame.Game2.prototype = {
 		if (enemy.animations.getAnimation('hit')) {
 			enemy.play('hit');
 		}
+		this.damageFlash(enemy);
 	} else { 
   	this.explosionSFX.play();
 		this.explode(enemy); 
@@ -481,9 +483,15 @@ BasicGame.Game2.prototype = {
 	} 
 	},
   
-  render: function() { 
-      //this.game.debug.body(this.bullet);
-      //this.game.debug.body(this.enemy);
+  render: function() {
+    if (!this.config.debug) { return; }
+    this.game.debug.body(this.player);
+    this.game.debug.body(this.boss);
+    this.enemyPool.forEachAlive(function (e) { this.game.debug.body(e); }, this);
+    this.shooterPool.forEachAlive(function (e) { this.game.debug.body(e); }, this);
+    this.bulletPool.forEachAlive(function (b) { this.game.debug.body(b); }, this);
+    this.enemyBulletPool.forEachAlive(function (b) { this.game.debug.body(b); }, this);
+    this.powerUpPool.forEachAlive(function (p) { this.game.debug.body(p); }, this);
   },
   
   //  
@@ -516,6 +524,9 @@ BasicGame.Game2.prototype = {
     }
     if (cfg.crisp) {
       sprite.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    }
+    if (cfg.angle !== undefined) {
+      sprite.angle = cfg.angle;
     }
     if (cfg.hitbox) {
       sprite.body.setSize(cfg.hitbox.width, cfg.hitbox.height, cfg.hitbox.offsetX || 0, cfg.hitbox.offsetY || 0);
@@ -754,7 +765,23 @@ BasicGame.Game2.prototype = {
       }, this);
     }, this);
   },
-  
+
+  damageFlash: function (sprite, duration, color) {
+    // Default to 100ms duration and white (ADD blend) if no color specified
+    duration = duration || 100;
+    if (color) {
+      sprite.tint = color;
+      this.time.events.add(duration, function () {
+        sprite.tint = 0xffffff;
+      }, this);
+    } else {
+      sprite.blendMode = PIXI.blendModes.ADD;
+      this.time.events.add(duration, function () {
+        sprite.blendMode = PIXI.blendModes.NORMAL;
+      }, this);
+    }
+  },
+
   displayEnd: function (win) { 
 	// you can't win and lose at the same time 
 	if (this.endText && this.endText.exists) { 

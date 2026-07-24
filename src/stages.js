@@ -3,7 +3,7 @@ BasicGame.STAGE1_CONFIG = {
   background: {
     key: 'bg1',
     type: 'image',
-    scrollSpeed: 12,
+    scrollSpeed: 300,
     loop: false
   },
 
@@ -58,7 +58,9 @@ BasicGame.STAGE1_CONFIG = {
     key: 'playerBullet',
     animated: false,
     scale: 0.2,
-    crisp: true
+    crisp: true,
+    angle: -90,
+    hitbox: { width: 8, height: 32, offsetX: 0, offsetY: -12 }
   },
 
   playerBullet: {
@@ -140,7 +142,10 @@ BasicGame.STAGE1_CONFIG = {
   gameOverMusic: 'gameOverMusic',
 
   // Next stage
-  nextState: null
+  nextState: null,
+
+  // Debug
+  debug: true
 };
 
 BasicGame.STAGE2_CONFIG = {
