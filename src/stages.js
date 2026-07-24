@@ -44,7 +44,7 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 1,
     crisp: true,
-    health: 5
+    health: 4
   },
 
   // Boss
@@ -62,7 +62,7 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 0.2,
     crisp: true,
-    damage: 2
+    damage: 1
   },
 
   playerBullet: {
@@ -70,7 +70,7 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 0.2,
     crisp: true,
-    damage: 2
+    damage: 1
   },
 
   // Shooter Enemy Bullet Config
@@ -190,7 +190,7 @@ BasicGame.STAGE2_CONFIG = {
     animated: true,
     scale: 1,
     crisp: true,
-    health: 4,
+    health: 2,
     animations: [
       { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
     ],
@@ -203,7 +203,7 @@ BasicGame.STAGE2_CONFIG = {
     animated: false,
     scale: 1,
     crisp: true,
-    health: 6
+    health: 4
   },
 
   // Boss
