@@ -21,9 +21,9 @@ BasicGame.STAGE1_CONFIG = {
     crisp: true,
     leanLeft: 'leanLeft',
     leanRight: 'leanRight',
-    hitbox: { width: 20, height: 20, offsetX: 0, offsetY: -5 }
+    hitbox: { width: 20, height: 20, offsetX: 0, offsetY: -5 },
+    health: 1
   },
-
 
   // Basic enemy
   enemy: {
@@ -31,6 +31,7 @@ BasicGame.STAGE1_CONFIG = {
     animated: true,
     scale: 1.5,
     crisp: true,
+    health: 2,
     animations: [
       { name: 'fly', frames: [0, 1], fps: 20, loop: true },
     ],
@@ -43,6 +44,7 @@ BasicGame.STAGE1_CONFIG = {
     animated: false,
     scale: 1,
     crisp: true,
+    health: 5
   },
 
   // Boss
@@ -51,36 +53,51 @@ BasicGame.STAGE1_CONFIG = {
     scale: 2.0,
     crisp: true,
     animated: false,
+    health: 500
   },
 
-  // Bullet
+  // Player Bullet Config
   bullet: {
     key: 'playerBullet',
     animated: false,
     scale: 0.2,
-    crisp: true
+    crisp: true,
+    damage: 1
   },
 
   playerBullet: {
-    key: 'player1Bullet',
-    animated: false
+    key: 'playerBullet',
+    animated: false,
+    scale: 0.2,
+    crisp: true,
+    damage: 1
   },
 
-
-
-  boss1Bullet: {
-    key: 'boss1Bullet',
-    animated: false
-  },
-  // Enemy bullet
+  // Shooter Enemy Bullet Config
   enemyBullet: {
     key: 'enemy1Bullet',
     animated: true,
     animations: [
       { name: 'fire', frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 10, loop: true }
     ],
-    defaultAnimation: 'fire'
+    defaultAnimation: 'fire',
+    damage: 1
   },
+
+  // Basic Enemy Bullet Config
+  enemy2Bullet: {
+    key: 'enemy1Bullet',
+    animated: false,
+    damage: 1
+  },
+
+  // Boss Bullet Config
+  boss1Bullet: {
+    key: 'boss1Bullet',
+    animated: false,
+    damage: 2
+  },
+
   // Explosion
   explosion: {
     key: 'shipexplosion',
@@ -92,7 +109,6 @@ BasicGame.STAGE1_CONFIG = {
     destroyOnComplete: true
   },
 
-
   enemy1Explosion: {
     key: 'explosion3',
     animated: true,
@@ -102,6 +118,7 @@ BasicGame.STAGE1_CONFIG = {
     defaultAnimation: 'boom',
     destroyOnComplete: true
   },
+
   enemy2Explosion: {
     key: 'explosion2',
     animated: true,
@@ -121,7 +138,6 @@ BasicGame.STAGE1_CONFIG = {
     defaultAnimation: 'boom',
     destroyOnComplete: true
   },
-
 
   // Power-up
   powerUp: {
@@ -164,7 +180,8 @@ BasicGame.STAGE2_CONFIG = {
     crisp: true,
     leanLeft: 'leanLeft',
     leanRight: 'leanRight',
-    hitbox: { width: 20, height: 20, offsetX: 0, offsetY: -5 }
+    hitbox: { width: 20, height: 20, offsetX: 0, offsetY: -5 },
+    health: 1
   },
 
   // Basic enemy
@@ -173,6 +190,7 @@ BasicGame.STAGE2_CONFIG = {
     animated: true,
     scale: 1,
     crisp: true,
+    health: 2,
     animations: [
       { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
     ],
@@ -185,12 +203,14 @@ BasicGame.STAGE2_CONFIG = {
     animated: false,
     scale: 1,
     crisp: true,
+    health: 5
   },
 
   // Boss
   boss: {
     key: 'boss',
     animated: true,
+    health: 500,
     animations: [
       { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
       { name: 'hit', frames: [3, 1, 3, 2], fps: 20, loop: false }
@@ -198,16 +218,36 @@ BasicGame.STAGE2_CONFIG = {
     defaultAnimation: 'fly'
   },
 
-  // Bullet
+  // Player Bullet
   bullet: {
     key: 'bullet',
-    animated: false
+    animated: false,
+    damage: 1
+  },
+
+  playerBullet: {
+    key: 'bullet',
+    animated: false,
+    damage: 1
   },
 
   // Enemy bullet
   enemyBullet: {
     key: 'enemyBullet',
-    animated: false
+    animated: false,
+    damage: 1
+  },
+
+  enemy2Bullet: {
+    key: 'enemyBullet',
+    animated: false,
+    damage: 1
+  },
+
+  boss1Bullet: {
+    key: 'enemyBullet',
+    animated: false,
+    damage: 2
   },
 
   // Explosion

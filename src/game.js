@@ -43,6 +43,11 @@ BasicGame.Game.prototype = {
     this.physics.arcade.overlap(
       this.player, this.enemyBulletPool, this.playerHit, null, this
     );
+    if (this.enemy2BulletPool) {
+      this.physics.arcade.overlap(
+        this.player, this.enemy2BulletPool, this.playerHit, null, this
+      );
+    }
     this.physics.arcade.overlap(
       this.player, this.bossRingBulletPool, this.playerHit, null, this
     );
@@ -107,13 +112,14 @@ BasicGame.Game.prototype = {
 
   spawnEnemies: function () {
     var eCfg = this.config.enemy;
+    var eHealth = this.getHealth(eCfg, BasicGame.ENEMY_HEALTH);
     if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
       var enemy = this.enemyPool.getFirstExists(false);
       // spawn at a random location top of the screen 
       enemy.reset(
         this.rnd.integerInRange(20, this.game.width - 20), 0,
-        BasicGame.ENEMY_HEALTH
+        eHealth
       );
       // also randomize the speed 
       enemy.body.velocity.y = this.rnd.integerInRange(
@@ -123,11 +129,12 @@ BasicGame.Game.prototype = {
     }
 
     var sCfg = this.config.shooter;
+    var sHealth = this.getHealth(sCfg, BasicGame.SHOOTER_HEALTH);
     if (this.nextShooterAt < this.time.now && this.shooterPool.countDead() > 0) {
       this.nextShooterAt = this.time.now + this.shooterDelay;
       var shooter = this.shooterPool.getFirstExists(false);
       // spawn at a random location at the top         
-      shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.SHOOTER_HEALTH);
+      shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, sHealth);
       // choose a random target location at the bottom       
       var target = this.rnd.integerInRange(20, this.game.width - 20);
       // move to target and rotate the sprite accordingly         
@@ -338,12 +345,28 @@ BasicGame.Game.prototype = {
 
   enemyHit: function (bullet, enemy) {
     bullet.kill();
-    this.damageEnemy(enemy, BasicGame.BULLET_DAMAGE);
+    var damage = (bullet && typeof bullet.bulletDamage === 'number') ? bullet.bulletDamage : BasicGame.BULLET_DAMAGE;
+    this.damageEnemy(enemy, damage);
   },
 
-  playerHit: function (player, enemy) {
-    // crashing into an enemy only deals 5 damage     
-    this.damageEnemy(enemy, BasicGame.CRASH_DAMAGE);
+  playerHit: function (player, enemyOrBullet) {
+    if (this.ghostUntil && this.ghostUntil > this.time.now) {
+      return;
+    }
+
+    var isEnemyShip = (enemyOrBullet === this.boss ||
+      (this.enemyPool && this.enemyPool.children.indexOf(enemyOrBullet) !== -1) ||
+      (this.shooterPool && this.shooterPool.children.indexOf(enemyOrBullet) !== -1) ||
+      (this.bossPool && this.bossPool.children.indexOf(enemyOrBullet) !== -1));
+
+    if (isEnemyShip) {
+      this.damageEnemy(enemyOrBullet, BasicGame.CRASH_DAMAGE);
+    } else {
+      var damage = (enemyOrBullet && typeof enemyOrBullet.bulletDamage === 'number') ? enemyOrBullet.bulletDamage : BasicGame.BULLET_DAMAGE;
+      console.log(damage);
+      enemyOrBullet.kill();
+    }
+
     var exCfg = this.config.explosion;
     var explosion = this.add.sprite(player.x, player.y, exCfg.key);
     explosion.anchor.setTo(0.5, 0.5);
@@ -369,6 +392,8 @@ BasicGame.Game.prototype = {
 
   damageEnemy: function (enemy, damage) {
     enemy.damage(damage);
+    console.log(damage);
+
     if (enemy.alive) {
       if (enemy.animations.getAnimation('hit')) {
         enemy.play('hit');
@@ -423,10 +448,11 @@ BasicGame.Game.prototype = {
 
   spawnBoss: function () {
     this.bossApproaching = true;
-    this.boss.reset(this.game.width / 2, 0, BasicGame.BOSS_HEALTH);
+    var bCfg = this.config.boss;
+    var bossHealth = this.getHealth(bCfg, BasicGame.BOSS_HEALTH);
+    this.boss.reset(this.game.width / 2, 0, bossHealth);
     this.physics.enable(this.boss, Phaser.Physics.ARCADE);
     this.boss.body.velocity.y = BasicGame.BOSS_Y_VELOCITY;
-    var bCfg = this.config.boss;
     if (bCfg.animated) {
       this.boss.play(bCfg.defaultAnimation);
     }
@@ -478,7 +504,7 @@ BasicGame.Game.prototype = {
 
     this.nextShotAt = this.time.now + this.shotDelay;
     this.playerFireSFX.play();
-    var bCfg = this.config.bullet;
+    var bCfg = this.config.playerBullet || this.config.bullet;
 
     var bullet;
     if (this.weaponLevel === 0) {
@@ -488,10 +514,6 @@ BasicGame.Game.prototype = {
       bullet = this.bulletPool.getFirstExists(false);
       bullet.reset(this.player.x, this.player.y - 20);
       bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
-      this.bulletPool.forEach(function (bullet) {
-        bullet.angle = -90;
-        bullet.body.setSize(8, 32, 12, -12); // adjust to your image
-      }, this);
       if (bCfg.animated) { bullet.play(bCfg.defaultAnimation); }
     } else {
       if (this.bulletPool.countDead() < this.weaponLevel * 2) {
@@ -560,6 +582,14 @@ BasicGame.Game.prototype = {
     }
   },
 
+  getHealth: function (cfg, defaultHealth) {
+    return (cfg && typeof cfg.health === 'number') ? cfg.health : defaultHealth;
+  },
+
+  getBulletDamage: function (cfg) {
+    return (cfg && typeof cfg.damage === 'number') ? cfg.damage : BasicGame.BULLET_DAMAGE;
+  },
+
   setupPlayer: function () {
     var cfg = this.config.player;
     this.player = this.add.sprite(this.game.width / 2, this.game.height - 50, cfg.key);
@@ -575,6 +605,9 @@ BasicGame.Game.prototype = {
     this.player.speed = BasicGame.PLAYER_SPEED;
     this.player.body.collideWorldBounds = true;
     this.applyScaleAndHitbox(this.player, cfg);
+    var pHealth = this.getHealth(cfg, BasicGame.PLAYER_HEALTH || 1);
+    this.player.health = pHealth;
+    this.player.maxHealth = pHealth;
     this.weaponLevel = this.game.weaponLevel || 0;
   },
 
@@ -668,6 +701,7 @@ BasicGame.Game.prototype = {
 
   setupBullets: function () {
     var ebCfg = this.config.enemyBullet;
+    var ebDamage = this.getBulletDamage(ebCfg);
     this.enemyBulletPool = this.add.group();
     this.enemyBulletPool.enableBody = true;
     this.enemyBulletPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -677,6 +711,7 @@ BasicGame.Game.prototype = {
     this.enemyBulletPool.setAll('outOfBoundsKill', true);
     this.enemyBulletPool.setAll('checkWorldBounds', true);
     this.enemyBulletPool.setAll('reward', 0, false, false, 0, true);
+    this.enemyBulletPool.setAll('bulletDamage', ebDamage, false, false, 0, true);
     if (ebCfg.animated) {
       this.enemyBulletPool.forEach(function (b) {
         for (var i = 0; i < ebCfg.animations.length; i++) {
@@ -691,7 +726,38 @@ BasicGame.Game.prototype = {
       }, this);
     }
 
-    var bCfg = this.config.bullet;
+    if (this.config.enemy2Bullet) {
+      var e2bCfg = this.config.enemy2Bullet;
+      var e2bDamage = this.getBulletDamage(e2bCfg);
+      this.enemy2BulletPool = this.add.group();
+      this.enemy2BulletPool.enableBody = true;
+      this.enemy2BulletPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.enemy2BulletPool.createMultiple(50, e2bCfg.key);
+      this.enemy2BulletPool.setAll('anchor.x', 0.5);
+      this.enemy2BulletPool.setAll('anchor.y', 0.5);
+      this.enemy2BulletPool.setAll('outOfBoundsKill', true);
+      this.enemy2BulletPool.setAll('checkWorldBounds', true);
+      this.enemy2BulletPool.setAll('reward', 0, false, false, 0, true);
+      this.enemy2BulletPool.setAll('bulletDamage', e2bDamage, false, false, 0, true);
+      if (e2bCfg.animated) {
+        this.enemy2BulletPool.forEach(function (b) {
+          for (var i = 0; i < e2bCfg.animations.length; i++) {
+            var anim = e2bCfg.animations[i];
+            b.animations.add(anim.name, anim.frames, anim.fps, anim.loop);
+          }
+          this.applyScaleAndHitbox(b, e2bCfg);
+        }, this);
+      } else if (e2bCfg.scale || e2bCfg.hitbox) {
+        this.enemy2BulletPool.forEach(function (b) {
+          this.applyScaleAndHitbox(b, e2bCfg);
+        }, this);
+      }
+    } else {
+      this.enemy2BulletPool = null;
+    }
+
+    var bCfg = this.config.playerBullet || this.config.bullet;
+    var bDamage = this.getBulletDamage(bCfg);
     // Add an empty sprite group into our game 
     this.bulletPool = this.add.group();
 
@@ -708,6 +774,7 @@ BasicGame.Game.prototype = {
     // Automatically kill the bullet sprites when they go out of bounds 
     this.bulletPool.setAll('outOfBoundsKill', true);
     this.bulletPool.setAll('checkWorldBounds', true);
+    this.bulletPool.setAll('bulletDamage', bDamage, false, false, 0, true);
 
     if (bCfg.animated) {
       this.bulletPool.forEach(function (b) {
@@ -728,7 +795,8 @@ BasicGame.Game.prototype = {
   },
 
   setupBossRingShot: function () {
-    var ebCfg = this.config.enemyBullet;
+    var ebCfg = this.config.boss1Bullet || this.config.enemyBullet;
+    var ebDamage = this.getBulletDamage(ebCfg);
     // Dedicated pool for ring shot bullets so they don't compete with normal enemy bullets
     this.bossRingBulletPool = this.add.group();
     this.bossRingBulletPool.enableBody = true;
@@ -739,6 +807,7 @@ BasicGame.Game.prototype = {
     this.bossRingBulletPool.setAll('outOfBoundsKill', true);
     this.bossRingBulletPool.setAll('checkWorldBounds', true);
     this.bossRingBulletPool.setAll('reward', 0, false, false, 0, true);
+    this.bossRingBulletPool.setAll('bulletDamage', ebDamage, false, false, 0, true);
     if (ebCfg.animated) {
       this.bossRingBulletPool.forEach(function (b) {
         for (var i = 0; i < ebCfg.animations.length; i++) {
