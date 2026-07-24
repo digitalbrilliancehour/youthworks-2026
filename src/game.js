@@ -118,9 +118,10 @@ BasicGame.Game.prototype = {
       var enemy = this.enemyPool.getFirstExists(false);
       // spawn at a random location top of the screen 
       enemy.reset(
-        this.rnd.integerInRange(20, this.game.width - 20), 0,
-        eHealth
+        this.rnd.integerInRange(20, this.game.width - 20), 0
       );
+      enemy.health = eHealth;
+      enemy.maxHealth = eHealth;
       // also randomize the speed 
       enemy.body.velocity.y = this.rnd.integerInRange(
         BasicGame.ENEMY_MIN_Y_VELOCITY, BasicGame.ENEMY_MAX_Y_VELOCITY
@@ -134,7 +135,9 @@ BasicGame.Game.prototype = {
       this.nextShooterAt = this.time.now + this.shooterDelay;
       var shooter = this.shooterPool.getFirstExists(false);
       // spawn at a random location at the top         
-      shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, sHealth);
+      shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0);
+      shooter.health = sHealth;
+      shooter.maxHealth = sHealth;
       // choose a random target location at the bottom       
       var target = this.rnd.integerInRange(20, this.game.width - 20);
       // move to target and rotate the sprite accordingly         
@@ -450,7 +453,9 @@ BasicGame.Game.prototype = {
     this.bossApproaching = true;
     var bCfg = this.config.boss;
     var bossHealth = this.getHealth(bCfg, BasicGame.BOSS_HEALTH);
-    this.boss.reset(this.game.width / 2, 0, bossHealth);
+    this.boss.reset(this.game.width / 2, 0);
+    this.boss.health = bossHealth;
+    this.boss.maxHealth = bossHealth;
     this.physics.enable(this.boss, Phaser.Physics.ARCADE);
     this.boss.body.velocity.y = BasicGame.BOSS_Y_VELOCITY;
     if (bCfg.animated) {
@@ -636,6 +641,7 @@ BasicGame.Game.prototype = {
 
   setupEnemies: function () {
     var eCfg = this.config.enemy;
+    var eHealth = this.getHealth(eCfg, BasicGame.ENEMY_HEALTH);
     this.enemyPool = this.add.group();
     this.enemyPool.enableBody = true;
     this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -646,6 +652,8 @@ BasicGame.Game.prototype = {
     this.enemyPool.setAll('checkWorldBounds', true);
     this.enemyPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
     this.enemyPool.setAll('dropRate', BasicGame.ENEMY_DROP_RATE, false, false, 0, true);
+    this.enemyPool.setAll('health', eHealth, false, false, 0, true);
+    this.enemyPool.setAll('maxHealth', eHealth, false, false, 0, true);
 
     // Set the animation for each sprite 
     this.enemyPool.forEach(function (enemy) {
@@ -665,6 +673,7 @@ BasicGame.Game.prototype = {
     this.enemyDelay = BasicGame.SPAWN_ENEMY_DELAY;
 
     var sCfg = this.config.shooter;
+    var sHealth = this.getHealth(sCfg, BasicGame.SHOOTER_HEALTH);
     this.shooterPool = this.add.group();
     this.shooterPool.enableBody = true;
     this.shooterPool.physicsBodyType = Phaser.Physics.ARCADE;
@@ -675,6 +684,8 @@ BasicGame.Game.prototype = {
     this.shooterPool.setAll('checkWorldBounds', true);
     this.shooterPool.setAll('reward', BasicGame.SHOOTER_REWARD, false, false, 0, true);
     this.shooterPool.setAll('dropRate', BasicGame.SHOOTER_DROP_RATE, false, false, 0, true);
+    this.shooterPool.setAll('health', sHealth, false, false, 0, true);
+    this.shooterPool.setAll('maxHealth', sHealth, false, false, 0, true);
     // Set the animation for each sprite     
     this.shooterPool.forEach(function (enemy) {
       if (sCfg.animated) {

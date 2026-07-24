@@ -190,7 +190,7 @@ BasicGame.STAGE2_CONFIG = {
     animated: true,
     scale: 1,
     crisp: true,
-    health: 3,
+    health: 4,
     animations: [
       { name: 'fly', frames: [0, 1, 2], fps: 20, loop: true },
     ],
@@ -203,7 +203,7 @@ BasicGame.STAGE2_CONFIG = {
     animated: false,
     scale: 1,
     crisp: true,
-    health: 5
+    health: 6
   },
 
   // Boss
